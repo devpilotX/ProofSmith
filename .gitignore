@@ -1,0 +1,17 @@
+# Lean / Lake build output
+/.lake/
+**/.lake/
+/build/
+/lake-packages/
+*.olean
+*.ilean
+*.trace
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+# os
+Thumbs.db
+.DS_Store
