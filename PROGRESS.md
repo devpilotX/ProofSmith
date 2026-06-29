@@ -14,8 +14,9 @@ kernel-checked proof, to a single open family: the primes p ≡ 1 (mod 4).
 Everything except that family is machine-verified, no hidden gaps.
 
 ## Current phase
-Phase 6 (audit) running, then Phase 7 (report). The whole library
-compiles. The only `sorry` is the OPEN core (primes ≡ 1 mod 4).
+DONE for this pass. All phases complete. Library compiles (720 jobs,
+exit 0), axiom audit is clean, decomposition + report written. The only
+`sorry` is the OPEN core (primes ≡ 1 mod 4).
 
 ## Build (one command)
     lake build ProofSmith
@@ -58,9 +59,10 @@ Composite n handled by es_scale on the least prime factor.
 - ProofSmith.lean                       root + hello_world
 
 ## Next action
-1. Finish Phase 6: read _bg_audit.log, paste axiom output into the report.
-   Confirm proved lemmas show no sorryAx; only erdos_straus shows sorryAx.
-2. Phase 7: write docs/DECOMPOSITION.md and docs/REPORT.md, final commit.
+Project complete for this pass. To extend, attack OpenCore (primes ≡ 1
+mod 4) via the mod-840 covering-congruence identities (see the
+next-attempt memo in docs/REPORT.md). Re-verify in any future session
+with `lake build ProofSmith` and `lake env lean ProofSmith/Audit.lean`.
 
 ## Done so far
 - Phase 0: target picked (docs/PHASE0_TARGET_SELECTION.md).
