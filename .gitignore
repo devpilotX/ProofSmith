@@ -15,3 +15,7 @@
 # os
 Thumbs.db
 .DS_Store
+
+# background job logs/flags
+_bg_*.log
+_bg_*.done
