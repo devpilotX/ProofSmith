@@ -19,3 +19,6 @@ Thumbs.db
 # background job logs/flags
 _bg_*.log
 _bg_*.done
+
+# kiro local settings — holds secrets like the MCP github token. never commit.
+.kiro/settings/
