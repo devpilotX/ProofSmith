@@ -1,82 +1,131 @@
-# ProofSmith
+# devpilotX — Formal Methods & Smart Contract Security
 
-ProofSmith attacks a hard math conjecture and only accepts proof that a
-formal proof kernel actually checks. No hand-waving, no "clearly". If the
-kernel did not accept it, it does not count.
+This repository hosts three independent research projects, each on its own
+branch. The `main` branch (here) is the **ProofSmith** project. The other
+two projects live as orphan branches with no shared history.
 
-This repo's target is the **Erdős–Straus conjecture**: for every integer
+## Projects
+
+| Branch | Project | What it does |
+|--------|---------|-------------|
+| `main` | **ProofSmith** | Lean 4 formal proof reducing the Erdős–Straus conjecture to a single open family |
+| `vault-verify` | **VaultVerify** | ERC-20 vault reentrancy audit — safe vs buggy, P1/P2/P3 proven with Halmos + Foundry |
+| `vault-guard` | **VaultGuard** | ERC-4626 inflation attack audit — naive vs hardened vault, I1–I4 + INF proven/tested |
+
+---
+
+## ProofSmith (this branch)
+
+ProofSmith attacks the **Erdős–Straus conjecture**: for every integer
 n ≥ 2 there are positive integers x, y, z with
 
     4/n = 1/x + 1/y + 1/z
 
-It is done in Lean 4 on top of mathlib.
+Done in Lean 4 on top of mathlib. The conjecture is not solved — it is
+still open. What this repo delivers is a full, gap-free, kernel-checked
+reduction of the whole conjecture down to one open family: the primes
+p ≡ 1 (mod 4). No hidden `sorry`, no surprise axiom.
 
-## Honest headline
+### What is proved
 
-The conjecture is **not solved**. It is still open.
+| Lemma | Status |
+|-------|--------|
+| es_of_two, es_two, es_three | PROVED |
+| es_scale, es_four_k_three, es_mod4 | PROVED |
+| es_of_primes, es_prime_of_core | PROVED |
+| erdos_straus_of_core | PROVED |
+| OpenCore (primes p ≡ 1 mod 4) | OPEN |
+| erdos_straus (full conjecture) | REDUCED to OpenCore |
 
-What this repo does have is a full, gap-free, kernel-checked reduction of
-the whole conjecture down to one open family: the primes p ≡ 1 (mod 4).
-Everything else is machine-verified. There is no hidden `sorry` and no
-surprise axiom. You can clone it, build it, and check the same statuses
-yourself.
-
-## What is proved
-
-| Lemma | What it says (cleared ℕ form) | Status |
-|-------|-------------------------------|--------|
-| es_of_two | 4·a·b = n·(a+b) ⟹ ErdosStraus n | PROVED |
-| es_two | ErdosStraus 2 | PROVED |
-| es_three | ErdosStraus 3 | PROVED |
-| es_scale | ErdosStraus n ⟹ ErdosStraus (n·m), m>0 | PROVED |
-| es_four_k_three | ErdosStraus (4k+3) | PROVED |
-| es_mod4 | n%4=3 ⟹ ErdosStraus n | PROVED |
-| es_of_primes | (∀ prime p, ES p) ⟹ ∀ n≥2, ES n | PROVED |
-| es_prime_of_core | (∀ prime p≡1[4], ES p) ⟹ ∀ prime p, ES p | PROVED |
-| erdos_straus_of_core | OpenCore ⟹ ∀ n≥2, ES n | PROVED |
-| OpenCore | ∀ prime p, p%4=1 → ErdosStraus p | OPEN |
-| erdos_straus | ∀ n≥2, ErdosStraus n | REDUCED to OpenCore |
-
-The reduction in one picture:
-
-    ErdosStraus for all n ≥ 2
-      ⇐ ErdosStraus for all primes p
-          p = 2             → es_two     PROVED
-          p ≡ 3 (mod 4)     → es_mod4    PROVED
-          p ≡ 1 (mod 4)     → OpenCore   OPEN   ← the wall
-      composite n: scale up from its least prime factor
-
-## Build
-
-One command. The toolchain installs itself from `lean-toolchain`
-(`leanprover/lean4:v4.31.0`).
+### Build
 
     lake build ProofSmith
 
-Re-run the axiom audit (this is what proves there is no hidden gap):
+Axiom audit (confirms no hidden gap):
 
     lake env lean ProofSmith/Audit.lean
 
-Heads up: in the machine this was built on, the bundled linker is blocked
-by an Application Control policy, so `lake exe cache get` does not work
-and no Lean executable can be linked. The fix is to build the needed
-mathlib subset from source. Oleans need no linker, so the library still
-compiles. The first build is around 700 files, so it takes a while.
+Toolchain auto-installs from `lean-toolchain` (`leanprover/lean4:v4.31.0`).
 
-## Layout
+### Layout
 
-    ProofSmith.lean                       root module + hello_world
     ProofSmith/ErdosStraus/Defs.lean      predicate, base cases, es_of_two
     ProofSmith/ErdosStraus/Scale.lean     es_scale
     ProofSmith/ErdosStraus/Residue.lean   es_four_k_three, es_mod4
     ProofSmith/ErdosStraus/Reduction.lean es_of_primes, OpenCore, north-star
     ProofSmith/Audit.lean                 #print axioms for every lemma
-    docs/                                 target pick, decomposition, full report
-    PROGRESS.md                           current state, read this first
+    docs/                                 target selection, decomposition, report
+    PROGRESS.md                           full state — read this first
 
-## The open core
+---
 
-The one thing left is the primes p ≡ 1 (mod 4). The plan to push further
-is the classical covering-congruence argument mod 840, which would shrink
-the open part to the same handful of residues the literature stops at. It
-would still not close the conjecture. Details are in `docs/REPORT.md`.
+## VaultVerify (branch: `vault-verify`)
+
+A minimal ERC-20 deposit/withdraw vault audited for three safety properties.
+Shows a concrete reentrancy exploit on a buggy vault and proves the safe
+vault resists it.
+
+**Toolchain:** Foundry forge 1.5.1, solc 0.8.24, Halmos 0.3.3, z3 4.12.6.0
+
+**Properties:**
+- P1 Solvency: vault token balance ≥ sum of all user balances
+- P2 No theft: a user cannot withdraw more than they deposited
+- P3 No tampering: one user's action cannot change another's balance
+
+**Results:**
+
+| Property | Safe vault | Buggy vault |
+|----------|-----------|-------------|
+| P1 Solvency | PROVEN (Halmos) + TESTED (Foundry invariant) | FAILED (exploit + Halmos counterexample) |
+| P2 No theft | PROVEN (Halmos) + TESTED (Foundry invariant) | FAILED (10 in, 110 out) |
+| P3 No tampering | PROVEN (Halmos) + TESTED (Foundry fuzz) | not the broken property |
+
+**Reproduce:**
+
+    forge test
+    python -m halmos --contract VaultHalmosTest    # safe: 5/5 PASS
+    python -m halmos --contract BuggyHalmosTest    # buggy: FAIL
+
+---
+
+## VaultGuard (branch: `vault-guard`)
+
+Two ERC-4626-style vaults — naive and hardened (OpenZeppelin virtual-offset
+fix) — audited against an inflation / donation / first-depositor attack.
+
+**Toolchain:** Foundry forge 1.7.1, solc 0.8.24, Halmos 0.3.3, z3 4.12.6.0
+
+**Properties:**
+- I1 Solvency: totalAssets() ≥ redeem value of all shares
+- I2 No round-trip profit: deposit then redeem never returns more than put in
+- I3 Rounding direction: share math always rounds in the vault's favour
+- I4 No share theft: only owner/approved spender can move or burn shares
+- INF Inflation resistance: the donation attacker cannot profit
+
+**Results:**
+
+| Property | Naive vault | Hardened vault |
+|----------|-------------|----------------|
+| I1 Solvency | PROVEN (Halmos, <2^64) + TESTED | TESTED |
+| I2 No round-trip profit | TESTED | TESTED |
+| I3 Rounding direction | TESTED | TESTED |
+| I4 No share theft | PROVEN (Halmos, <2^64) + TESTED | PROVEN (Halmos, <2^64) + TESTED |
+| INF Inflation resistance | FAILED (exploit + Halmos counterexample) | TESTED (fuzz 20 000 runs + worked example) |
+
+**Reproduce:**
+
+    forge test
+    python -m halmos --contract NaiveVaultHalmosTest
+    python -m halmos --contract HardenedVaultHalmosTest
+
+---
+
+## Honesty gate (all projects)
+
+- **PROVEN** = a symbolic tool (Halmos / Lean kernel) verified it for all
+  inputs in the stated bounds. No counterexample exists in that range.
+- **TESTED** = fuzzing or invariant runs passed. That is sampling, not a proof.
+- **FAILED** = a counterexample or working exploit was found, inputs shown.
+- **OPEN** = not yet proved, not yet disproved.
+
+Nothing is called PROVEN because fuzzing passed.
