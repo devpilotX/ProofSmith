@@ -1,0 +1,15 @@
+# foundry build output
+out/
+cache/
+broadcast/
+
+# background job logs/flags
+_bg_*.log
+_bg_*.done
+_bg_*.cmd
+
+# editor/os
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
