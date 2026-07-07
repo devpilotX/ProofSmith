@@ -1,0 +1,16 @@
+# foundry build output
+cache/
+out/
+broadcast/
+
+# halmos
+halmos-cache/
+.halmos_cache/
+
+# background job logs and flags
+_bg_*.log
+_bg_*.done
+_bg_*.cmd
+
+# env / secrets
+.env

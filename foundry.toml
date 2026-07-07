@@ -1,0 +1,21 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 200
+# halmos reads the solc AST from the build artifacts, so keep it on.
+ast = true
+# the forge linter only emits style notes here. turn it off so it does
+# not clutter output or muddy exit codes in background runs.
+lint = { lint_on_build = false }
+
+# fuzz/invariant defaults. raised per test where it matters.
+[fuzz]
+runs = 512
+
+[invariant]
+runs = 256
+depth = 64
+fail_on_revert = false
